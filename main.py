@@ -16,14 +16,19 @@ BLACK = (0, 0, 0)
 # 定义字体
 font = pygame.font.SysFont(None, 75)
 
+# 定义网格大小
+GRID_SIZE = 50
+GRID_WIDTH = 800 // GRID_SIZE
+GRID_HEIGHT = 600 // GRID_SIZE
+
 # 植物类
 class Plant(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((50, 50))
+        self.image = pygame.Surface((GRID_SIZE - 4, GRID_SIZE - 4))  # 减小植物大小以增加间距
         self.image.fill(GREEN)
         self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
+        self.rect.topleft = (x + 2, y + 2)  # 调整位置以保持居中
         self.last_shot_time = pygame.time.get_ticks()
         self.health = 100  # 植物的生命值
     
@@ -31,7 +36,7 @@ class Plant(pygame.sprite.Sprite):
         # 每秒发射一颗子弹
         current_time = pygame.time.get_ticks()
         if current_time - self.last_shot_time > 1000:
-            bullet = Bullet(self.rect.centerx, self.rect.centery)
+            bullet = Bullet(self.rect.right, self.rect.centery)
             bullets.add(bullet)
             self.last_shot_time = current_time
     
@@ -58,10 +63,10 @@ class Bullet(pygame.sprite.Sprite):
 class Zombie(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((50, 50))
+        self.image = pygame.Surface((GRID_SIZE, GRID_SIZE))
         self.image.fill(WHITE)
         self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
+        self.rect.topleft = (x, y)
         self.speed = 1
         self.health = 100  # 僵尸的生命值
         self.attacking = False
@@ -87,14 +92,13 @@ class Zombie(pygame.sprite.Sprite):
             plant.take_damage(20)
             self.last_attack_time = current_time
 
-# 创建植物实例
-plant = Plant(100, 300)
-plants = pygame.sprite.Group(plant)
+# 创建植物组
+plants = pygame.sprite.Group()
 
 # 创建僵尸组
 zombies = pygame.sprite.Group()
-for i in range(15):
-    zombie = Zombie(random.randint(800, 1600), 300)
+for i in range(5):
+    zombie = Zombie(random.randint(800, 1600), random.choice([i * GRID_SIZE for i in range(GRID_HEIGHT)]))
     zombies.add(zombie)
 
 # 创建子弹组
@@ -108,6 +112,16 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            # 获取鼠标点击位置
+            mouse_x, mouse_y = event.pos
+            # 计算点击的网格坐标
+            grid_x = (mouse_x // GRID_SIZE) * GRID_SIZE
+            grid_y = (mouse_y // GRID_SIZE) * GRID_SIZE
+            # 检查该位置是否已有植物
+            if not any(plant.rect.collidepoint(grid_x + 2, grid_y + 2) for plant in plants):
+                plant = Plant(grid_x, grid_y)
+                plants.add(plant)
 
     # 更新
     plants.update()
@@ -124,7 +138,7 @@ while running:
     for zombie in zombies:
         if pygame.sprite.spritecollideany(zombie, plants):
             zombie.attacking = True
-            zombie.attack(plant)
+            zombie.attack(pygame.sprite.spritecollideany(zombie, plants))
         else:
             zombie.attacking = False
 
