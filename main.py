@@ -2,13 +2,15 @@ import pygame
 import sys
 import time
 import random
+from plants import Peashooter, WallNut, CherryBomb
 
 # 初始化Pygame
 pygame.init()
 
 # 设置屏幕大小
 screen_width = 400
-screen_height = 250
+screen_height = 300
+
 screen = pygame.display.set_mode((screen_width, screen_height))
 
 # 设置颜色
@@ -24,77 +26,6 @@ cols = 10
 rows = 6
 cell_width = screen_width // cols
 cell_height = (screen_height - 50) // rows  # 减去顶部植物栏的高度
-
-# 定义植物类
-class Plant(pygame.sprite.Sprite):
-    def __init__(self, x, y, health, color):
-        super().__init__()
-        self.image = pygame.Surface((cell_width, cell_height))
-        self.image.fill(color)
-        self.rect = self.image.get_rect()
-        self.rect.topleft = (x, y)
-        self.health = health
-
-    def update(self):
-        if self.health <= 0:
-            self.kill()
-
-class Peashooter(Plant):
-    def __init__(self, x, y):
-        super().__init__(x, y, 100, green)
-        self.last_shot = time.time()
-    
-    def update(self):
-        super().update()
-        if time.time() - self.last_shot >= 1:
-            bullet = Bullet(self.rect.right, self.rect.centery)
-            all_sprites.add(bullet)
-            bullets.add(bullet)
-            self.last_shot = time.time()
-
-class WallNut(Plant):
-    def __init__(self, x, y):
-        super().__init__(x, y, 10000, brown)
-
-class CherryBomb(Plant):
-    def __init__(self, x, y):
-        super().__init__(x, y, 10000, red)
-        self.plant_time = time.time()
-    
-    def update(self):
-        super().update()
-        if time.time() - self.plant_time >= 0.5:
-            self.explode()
-    
-    def explode(self):
-        # 计算3x3范围
-        for zombie in zombies:
-            if abs(zombie.rect.centerx - self.rect.centerx) <= 1.5 * cell_width and abs(zombie.rect.centery - self.rect.centery) <= 1.5 * cell_height:
-                zombie.take_damage(10000)
-        self.kill()
-
-# 子弹类
-class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.image = pygame.Surface((10, 10))
-        self.image.fill(grey)  # 设置子弹颜色为灰色
-        self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
-        self.speed = 5
-        self.damage = 20
-    
-    def update(self):
-        self.rect.x += self.speed
-        if self.rect.left > screen_width:
-            self.kill()
-        # 检查与僵尸的碰撞
-        hit_zombies = pygame.sprite.spritecollide(self, zombies, False)
-        if hit_zombies:
-            # 找到最左边的僵尸
-            leftmost_zombie = min(hit_zombies, key=lambda z: z.rect.x)
-            leftmost_zombie.take_damage(self.damage)
-            self.kill()
 
 # 僵尸类
 class Zombie(pygame.sprite.Sprite):
@@ -117,7 +48,6 @@ class Zombie(pygame.sprite.Sprite):
         # 检查与植物的碰撞
         hit_plants = pygame.sprite.spritecollide(self, plants, False)
         if hit_plants:
-            # 每秒攻击6次
             if time.time() - self.last_attack_time >= 1/6:
                 for plant in hit_plants:
                     plant.health -= 20
@@ -211,7 +141,12 @@ def game_loop():
                 elif plant_selected:
                     col = x // cell_width
                     row = (y - 50) // cell_height
-                    plant = plant_selected(col * cell_width, 50 + row * cell_height)
+                    if plant_selected == Peashooter:
+                        plant = plant_selected(col * cell_width, 50 + row * cell_height, all_sprites, bullets, zombies)
+                    elif plant_selected == CherryBomb:
+                        plant = plant_selected(col * cell_width, 50 + row * cell_height, all_sprites, zombies, cell_width, cell_height)
+                    else:
+                        plant = plant_selected(col * cell_width, 50 + row * cell_height)
                     all_sprites.add(plant)
                     plants.add(plant)
                     plant_selected = None

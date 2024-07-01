@@ -1,0 +1,87 @@
+# Python Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Pygame specific
+*.log
+*.pickle
+
+# General MacOS and Windows files
+.DS_Store
+Thumbs.db
+
+# IDE and Editor specific
+.vscode/
+.idea/
+*.swp
+
+# Python Virtual Environment
+venv/
+ENV/
+env/
+.venv/
+.Python
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# PyCharm
+/.idea
+*.iml
+
+# VSCode
+.vscode/
+
+# Pipenv
+Pipfile.lock
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Logs
+logs
+*.log
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+
+# Coverage directory used by tools like istanbul
+coverage/
