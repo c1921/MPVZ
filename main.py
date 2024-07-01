@@ -134,7 +134,7 @@ zombie_spawn_count = 0
 
 def spawn_zombies(amount):
     global zombie_spawn_count
-    if zombie_spawn_count >= 100:
+    if zombie_spawn_count >= 11:
         return
     for _ in range(amount):
         row = random.randint(0, rows - 1)
@@ -143,8 +143,16 @@ def spawn_zombies(amount):
         zombies.add(zombie)
     zombie_spawn_count += 1
 
-def main():
+def game_loop():
     global zombie_spawn_count
+    # 重置计数器和精灵组
+    zombie_spawn_count = 0
+    all_sprites.empty()
+    bullets.empty()
+    plants.empty()
+    zombies.empty()
+    all_sprites.add(plant_bar)
+
     clock = pygame.time.Clock()
     running = True
     plant_selected = False
@@ -156,7 +164,6 @@ def main():
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -194,17 +201,54 @@ def main():
         # 检查是否有僵尸移动到最左边
         for zombie in zombies:
             if zombie.rect.right <= 0:
-                print("Game Over")
-                running = False
-                break
+                return "Game Over"
 
         # 检查胜利条件
-        if zombie_spawn_count >= 100 and len(zombies) == 0:
-            print("You Win!")
-            running = False
+        if zombie_spawn_count >= 11 and len(zombies) == 0:
+            return "You Win!"
 
         pygame.display.flip()
         clock.tick(60)
+
+def main_menu():
+    font = pygame.font.Font(None, 36)
+    while True:
+        screen.fill(black)
+        text = font.render("Press SPACE to Start", True, white)
+        screen.blit(text, (screen_width // 2 - text.get_width() // 2, screen_height // 2 - text.get_height() // 2))
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    return
+
+def main():
+    while True:
+        main_menu()
+        result = game_loop()
+        font = pygame.font.Font(None, 36)
+        while True:
+            screen.fill(black)
+            text = font.render(result, True, white)
+            screen.blit(text, (screen_width // 2 - text.get_width() // 2, screen_height // 2 - text.get_height() // 2))
+            text = font.render("Press SPACE to Return to Main Menu", True, white)
+            screen.blit(text, (screen_width // 2 - text.get_width() // 2, screen_height // 2 - text.get_height() // 2 + 50))
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        break
+            else:
+                continue
+            break
 
 if __name__ == "__main__":
     main()
