@@ -116,7 +116,9 @@ def main():
     clock = pygame.time.Clock()
     running = True
     plant_selected = False
-    zombie_spawn_time = time.time()
+    start_time = time.time()
+    zombie_spawn_interval = 3  # 初始僵尸生成间隔（秒）
+    last_zombie_spawn_time = time.time()
 
     while running:
         for event in pygame.event.get():
@@ -136,13 +138,18 @@ def main():
                     plants.add(plant)
                     plant_selected = False
 
+        # 动态调整僵尸生成频率
+        elapsed_time = time.time() - start_time
+        if elapsed_time > 30:  # 每经过30秒，增加僵尸生成频率
+            zombie_spawn_interval = max(0.5, 3 - (elapsed_time // 30) * 0.5)  # 最低间隔为0.5秒
+
         # 生成僵尸
-        if time.time() - zombie_spawn_time >= 3:
+        if time.time() - last_zombie_spawn_time >= zombie_spawn_interval:
             row = random.randint(0, rows - 1)
             zombie = Zombie(screen_width, 50 + row * cell_height)
             all_sprites.add(zombie)
             zombies.add(zombie)
-            zombie_spawn_time = time.time()
+            last_zombie_spawn_time = time.time()
 
         screen.fill(black)
         draw_grid()
