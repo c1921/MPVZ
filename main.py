@@ -47,7 +47,7 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.image = pygame.Surface((10, 10))
-        self.image.fill(grey)
+        self.image.fill(grey)  # 设置子弹颜色为灰色
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.speed = 5
@@ -73,9 +73,12 @@ class Zombie(pygame.sprite.Sprite):
         self.rect.topleft = (x, y)
         self.health = 100
         self.speed = 1
+        self.frame_count = 0  # 添加一个帧计数器
     
     def update(self):
-        self.rect.x -= self.speed
+        self.frame_count += 1
+        if self.frame_count % 3 == 0:  # 每3帧移动1像素
+            self.rect.x -= self.speed
         if self.rect.right < 0:
             self.kill()
     
