@@ -185,6 +185,14 @@ def main():
         draw_grid()
         all_sprites.update()
         all_sprites.draw(screen)
+
+        # 检查是否有僵尸移动到最左边
+        for zombie in zombies:
+            if zombie.rect.right <= 0:
+                print("Game Over")
+                running = False
+                break
+
         pygame.display.flip()
         clock.tick(60)
 
