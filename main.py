@@ -2,7 +2,7 @@ import pygame
 import sys
 import time
 import random
-from plants import Peashooter, WallNut, CherryBomb
+from plants import Peashooter, WallNut, CherryBomb, IceShooter
 from zombies import RegularZombie, ConeheadZombie, BucketheadZombie
 
 # 初始化Pygame
@@ -11,7 +11,6 @@ pygame.init()
 # 设置屏幕大小
 screen_width = 400
 screen_height = 300
-
 screen = pygame.display.set_mode((screen_width, screen_height))
 
 # 设置颜色
@@ -21,6 +20,7 @@ grey = (128, 128, 128)
 green = (0, 255, 0)
 brown = (139, 69, 19)
 red = (255, 0, 0)
+blue = (0, 0, 255)
 
 # 设置网格大小
 cols = 10
@@ -42,9 +42,12 @@ class PlantBar(pygame.sprite.Sprite):
         self.wallnut_icon.fill(brown)
         self.cherrybomb_icon = pygame.Surface((cell_width, cell_height))
         self.cherrybomb_icon.fill(red)
+        self.iceshooter_icon = pygame.Surface((cell_width, cell_height))
+        self.iceshooter_icon.fill(blue)
         self.image.blit(self.peashooter_icon, (10, 10))
         self.image.blit(self.wallnut_icon, (cell_width + 20, 10))
         self.image.blit(self.cherrybomb_icon, (2 * cell_width + 30, 10))
+        self.image.blit(self.iceshooter_icon, (3 * cell_width + 40, 10))
 
 def draw_grid():
     for col in range(cols):
@@ -109,6 +112,8 @@ def game_loop():
                         plant_selected = WallNut
                     elif x < 3 * cell_width + 30:
                         plant_selected = CherryBomb
+                    elif x < 4 * cell_width + 40:
+                        plant_selected = IceShooter
                 elif plant_selected:
                     col = x // cell_width
                     row = (y - 50) // cell_height
@@ -116,6 +121,8 @@ def game_loop():
                         plant = plant_selected(col * cell_width, 50 + row * cell_height, all_sprites, bullets, zombies)
                     elif plant_selected == CherryBomb:
                         plant = plant_selected(col * cell_width, 50 + row * cell_height, all_sprites, zombies, cell_width, cell_height)
+                    elif plant_selected == IceShooter:
+                        plant = plant_selected(col * cell_width, 50 + row * cell_height, all_sprites, bullets, zombies)
                     else:
                         plant = plant_selected(col * cell_width, 50 + row * cell_height)
                     all_sprites.add(plant)
