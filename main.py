@@ -1,6 +1,7 @@
 import pygame
 import sys
 import time
+import random
 
 # 初始化Pygame
 pygame.init()
@@ -13,6 +14,7 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 # 设置颜色
 black = (0, 0, 0)
 white = (255, 255, 255)
+grey = (128, 128, 128)
 green = (0, 255, 0)
 red = (255, 0, 0)
 
@@ -45,7 +47,7 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.image = pygame.Surface((10, 10))
-        self.image.fill(white)
+        self.image.fill(grey)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.speed = 5
@@ -136,7 +138,8 @@ def main():
 
         # 生成僵尸
         if time.time() - zombie_spawn_time >= 3:
-            zombie = Zombie(screen_width, 50 + (cell_height * (rows - 1)))
+            row = random.randint(0, rows - 1)
+            zombie = Zombie(screen_width, 50 + row * cell_height)
             all_sprites.add(zombie)
             zombies.add(zombie)
             zombie_spawn_time = time.time()
