@@ -46,9 +46,8 @@ class Zombie(pygame.sprite.Sprite):
             self.kill()
 
     def apply_ice_effect(self, duration):
-        if not self.ice_effect_start_time:
-            self.current_frame_interval = self.original_frame_interval * 2  # 将移动帧数间隔加倍
-            self.ice_effect_start_time = time.time()
+        self.current_frame_interval = self.original_frame_interval * 2  # 将移动帧数间隔加倍
+        self.ice_effect_start_time = time.time()  # 重置寒冰效果开始时间
 
 class RegularZombie(Zombie):
     def __init__(self, x, y, plants):
