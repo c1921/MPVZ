@@ -32,6 +32,7 @@ class Plant(pygame.sprite.Sprite):
         self.image.fill(green)
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
+        self.health = 100
         self.last_shot = time.time()
     
     def update(self):
@@ -41,6 +42,10 @@ class Plant(pygame.sprite.Sprite):
             all_sprites.add(bullet)
             bullets.add(bullet)
             self.last_shot = time.time()
+        
+        # 检查植物的健康状态
+        if self.health <= 0:
+            self.kill()
 
 # 子弹类
 class Bullet(pygame.sprite.Sprite):
@@ -76,6 +81,7 @@ class Zombie(pygame.sprite.Sprite):
         self.health = 100
         self.speed = 1
         self.frame_count = 0  # 添加一个帧计数器
+        self.last_attack_time = time.time()
     
     def update(self):
         self.frame_count += 1
@@ -83,6 +89,15 @@ class Zombie(pygame.sprite.Sprite):
             self.rect.x -= self.speed
         if self.rect.right < 0:
             self.kill()
+
+        # 检查与植物的碰撞
+        hit_plants = pygame.sprite.spritecollide(self, plants, False)
+        if hit_plants:
+            # 每秒攻击6次
+            if time.time() - self.last_attack_time >= 1/6:
+                for plant in hit_plants:
+                    plant.health -= 20
+                self.last_attack_time = time.time()
     
     def take_damage(self, damage):
         self.health -= damage
