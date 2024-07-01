@@ -9,19 +9,35 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 # 设置颜色
 black = (0, 0, 0)
 white = (255, 255, 255)
+grey = (200, 200, 200)
+
+def draw_button(screen, text, x, y, w, h, inactive_color, active_color, font_size=24):
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+
+    if x + w > mouse[0] > x and y + h > mouse[1] > y:
+        pygame.draw.rect(screen, active_color, (x, y, w, h))
+        if click[0] == 1:
+            return True
+    else:
+        pygame.draw.rect(screen, inactive_color, (x, y, w, h))
+
+    small_text = pygame.font.Font(None, font_size)
+    text_surf = small_text.render(text, True, black)
+    text_rect = text_surf.get_rect(center=(x + w / 2, y + h / 2))
+    screen.blit(text_surf, text_rect)
+    
+    return False
 
 def main_menu():
     font = pygame.font.Font(None, 36)
     while True:
         screen.fill(black)
-        text = font.render("Press SPACE to Start", True, white)
-        screen.blit(text, (screen_width // 2 - text.get_width() // 2, screen_height // 2 - text.get_height() // 2))
+        if draw_button(screen, "Start Game", screen_width // 2 - 50, screen_height // 2 - 25, 100, 50, grey, white, font_size=24):
+            return
         pygame.display.flip()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    return
