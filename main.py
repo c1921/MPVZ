@@ -59,8 +59,10 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
         # 检查与僵尸的碰撞
         hit_zombies = pygame.sprite.spritecollide(self, zombies, False)
-        for zombie in hit_zombies:
-            zombie.take_damage(self.damage)
+        if hit_zombies:
+            # 找到最左边的僵尸
+            leftmost_zombie = min(hit_zombies, key=lambda z: z.rect.x)
+            leftmost_zombie.take_damage(self.damage)
             self.kill()
 
 # 僵尸类
@@ -115,6 +117,13 @@ zombies = pygame.sprite.Group()
 plant_bar = PlantBar()
 all_sprites.add(plant_bar)
 
+def spawn_zombies(amount):
+    for _ in range(amount):
+        row = random.randint(0, rows - 1)
+        zombie = Zombie(screen_width, 50 + row * cell_height)
+        all_sprites.add(zombie)
+        zombies.add(zombie)
+
 def main():
     clock = pygame.time.Clock()
     running = True
@@ -122,6 +131,7 @@ def main():
     start_time = time.time()
     zombie_spawn_interval = 3  # 初始僵尸生成间隔（秒）
     last_zombie_spawn_time = time.time()
+    last_horde_spawn_time = time.time()
 
     while running:
         for event in pygame.event.get():
@@ -146,13 +156,15 @@ def main():
         if elapsed_time > 30:  # 每经过30秒，增加僵尸生成频率
             zombie_spawn_interval = max(0.5, 3 - (elapsed_time // 30) * 0.5)  # 最低间隔为0.5秒
 
-        # 生成僵尸
+        # 生成普通僵尸
         if time.time() - last_zombie_spawn_time >= zombie_spawn_interval:
-            row = random.randint(0, rows - 1)
-            zombie = Zombie(screen_width, 50 + row * cell_height)
-            all_sprites.add(zombie)
-            zombies.add(zombie)
+            spawn_zombies(1)
             last_zombie_spawn_time = time.time()
+
+        # 每隔1分钟生成大量僵尸
+        if time.time() - last_horde_spawn_time >= 60:
+            spawn_zombies(10)  # 生成10个僵尸
+            last_horde_spawn_time = time.time()
 
         screen.fill(black)
         draw_grid()
