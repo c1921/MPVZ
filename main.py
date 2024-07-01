@@ -87,9 +87,6 @@ class Zombie(pygame.sprite.Sprite):
         self.frame_count += 1
         if self.frame_count % 3 == 0:  # 每3帧移动1像素
             self.rect.x -= self.speed
-        if self.rect.right < 0:
-            self.kill()
-
         # 检查与植物的碰撞
         hit_plants = pygame.sprite.spritecollide(self, plants, False)
         if hit_plants:
@@ -132,14 +129,22 @@ zombies = pygame.sprite.Group()
 plant_bar = PlantBar()
 all_sprites.add(plant_bar)
 
+# 计数器，用于跟踪spawn_zombies的调用次数
+zombie_spawn_count = 0
+
 def spawn_zombies(amount):
+    global zombie_spawn_count
+    if zombie_spawn_count >= 100:
+        return
     for _ in range(amount):
         row = random.randint(0, rows - 1)
         zombie = Zombie(screen_width, 50 + row * cell_height)
         all_sprites.add(zombie)
         zombies.add(zombie)
+    zombie_spawn_count += 1
 
 def main():
+    global zombie_spawn_count
     clock = pygame.time.Clock()
     running = True
     plant_selected = False
@@ -192,6 +197,11 @@ def main():
                 print("Game Over")
                 running = False
                 break
+
+        # 检查胜利条件
+        if zombie_spawn_count >= 100 and len(zombies) == 0:
+            print("You Win!")
+            running = False
 
         pygame.display.flip()
         clock.tick(60)
