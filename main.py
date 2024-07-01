@@ -3,6 +3,7 @@ import sys
 import time
 import random
 from plants import Peashooter, WallNut, CherryBomb
+from zombies import RegularZombie, ConeheadZombie, BucketheadZombie
 
 # 初始化Pygame
 pygame.init()
@@ -26,37 +27,6 @@ cols = 10
 rows = 6
 cell_width = screen_width // cols
 cell_height = (screen_height - 50) // rows  # 减去顶部植物栏的高度
-
-# 僵尸类
-class Zombie(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.image = pygame.Surface((cell_width, cell_height))
-        self.image.fill(red)
-        self.rect = self.image.get_rect()
-        self.rect.topleft = (x, y)
-        self.health = 100
-        self.speed = 1
-        self.frame_count = 0  # 添加一个帧计数器
-        self.last_attack_time = time.time()
-    
-    def update(self):
-        self.frame_count += 1
-        if self.frame_count % 3 == 0:  # 每3帧移动1像素
-            if not pygame.sprite.spritecollideany(self, plants):
-                self.rect.x -= self.speed
-        # 检查与植物的碰撞
-        hit_plants = pygame.sprite.spritecollide(self, plants, False)
-        if hit_plants:
-            if time.time() - self.last_attack_time >= 1/6:
-                for plant in hit_plants:
-                    plant.health -= 20
-                self.last_attack_time = time.time()
-    
-    def take_damage(self, damage):
-        self.health -= damage
-        if self.health <= 0:
-            self.kill()
 
 # 植物栏类
 class PlantBar(pygame.sprite.Sprite):
@@ -101,7 +71,8 @@ def spawn_zombies(amount):
         return
     for _ in range(amount):
         row = random.randint(0, rows - 1)
-        zombie = Zombie(screen_width, 50 + row * cell_height)
+        zombie_type = random.choice([RegularZombie, ConeheadZombie, BucketheadZombie])
+        zombie = zombie_type(screen_width, 50 + row * cell_height, plants)
         all_sprites.add(zombie)
         zombies.add(zombie)
     zombie_spawn_count += 1
