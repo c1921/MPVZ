@@ -11,6 +11,8 @@ black = (0, 0, 0)
 white = (255, 255, 255)
 grey = (200, 200, 200)
 
+pygame.init()  # 初始化Pygame
+
 def draw_button(screen, text, x, y, w, h, inactive_color, active_color, font_size=24):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
@@ -30,7 +32,6 @@ def draw_button(screen, text, x, y, w, h, inactive_color, active_color, font_siz
     return False
 
 def main_menu():
-    font = pygame.font.Font(None, 36)
     while True:
         screen.fill(black)
         if draw_button(screen, "Start Game", screen_width // 2 - 50, screen_height // 2 - 25, 100, 50, grey, white, font_size=24):

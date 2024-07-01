@@ -4,6 +4,7 @@ from game import game_loop
 from menu import main_menu, draw_button
 
 pygame.init()
+pygame.font.init()  # 初始化字体模块
 
 def display_message(screen, message):
     font = pygame.font.Font(None, 36)
